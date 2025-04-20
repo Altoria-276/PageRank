@@ -1,0 +1,120 @@
+[2025-04-16 18:12:38] pagerank.py
+Maximum: 44.75 MB
+Time: 0.61 s
+
+[2025-04-16 18:12:39] pagerank.py
+Maximum: 42.99 MB
+Time: 0.41 s
+
+[2025-04-16 18:12:39] pagerank.py
+Maximum: 53.15 MB
+Time: 0.40 s
+
+[2025-04-16 18:12:39] pagerank.py
+Maximum: 52.54 MB
+Time: 0.40 s
+
+[2025-04-16 18:12:40] pagerank.py
+Maximum: 44.30 MB
+Time: 0.51 s
+
+[2025-04-16 18:12:40] pagerank.py
+Maximum: 53.29 MB
+Time: 0.51 s
+
+[2025-04-16 18:12:41] pagerank.py
+Maximum: 45.32 MB
+Time: 0.51 s
+
+[2025-04-16 18:12:41] pagerank.py
+Maximum: 51.92 MB
+Time: 0.51 s
+
+[2025-04-16 18:12:42] pagerank.py
+Maximum: 43.14 MB
+Time: 0.51 s
+
+[2025-04-16 18:12:43] pagerank.py
+Maximum: 45.27 MB
+Time: 0.59 s
+
+[2025-04-16 21:23:49] pagerank_deepseek.py
+Maximum: 53.76 MB
+Time: 0.71 s
+
+[2025-04-16 21:23:50] pagerank_deepseek.py
+Maximum: 53.07 MB
+Time: 0.71 s
+
+[2025-04-16 21:23:50] pagerank_deepseek.py
+Maximum: 53.33 MB
+Time: 0.71 s
+
+[2025-04-16 21:23:51] pagerank_deepseek.py
+Maximum: 53.96 MB
+Time: 0.71 s
+
+[2025-04-16 21:23:52] pagerank_deepseek.py
+Maximum: 53.43 MB
+Time: 0.71 s
+
+[2025-04-16 21:23:52] pagerank_deepseek.py
+Maximum: 53.89 MB
+Time: 0.71 s
+
+[2025-04-16 21:23:53] pagerank_deepseek.py
+Maximum: 53.36 MB
+Time: 0.71 s
+
+[2025-04-16 21:23:54] pagerank_deepseek.py
+Maximum: 52.76 MB
+Time: 0.71 s
+
+[2025-04-16 21:23:55] pagerank_deepseek.py
+Maximum: 53.01 MB
+Time: 0.71 s
+
+[2025-04-16 21:23:55] pagerank_deepseek.py
+Maximum: 52.97 MB
+Time: 0.71 s
+
+[2025-04-16 21:24:13] pagerank.py
+Maximum: 42.60 MB
+Time: 0.30 s
+
+[2025-04-16 21:24:13] pagerank.py
+Maximum: 40.28 MB
+Time: 0.40 s
+
+[2025-04-16 21:24:13] pagerank.py
+Maximum: 41.68 MB
+Time: 0.39 s
+
+[2025-04-16 21:24:14] pagerank.py
+Maximum: 45.26 MB
+Time: 0.30 s
+
+[2025-04-16 21:24:14] pagerank.py
+Maximum: 45.41 MB
+Time: 0.31 s
+
+[2025-04-16 21:24:14] pagerank.py
+Maximum: 46.12 MB
+Time: 0.30 s
+
+[2025-04-16 21:24:15] pagerank.py
+Maximum: 45.57 MB
+Time: 0.30 s
+
+[2025-04-16 21:24:15] pagerank.py
+Maximum: 44.09 MB
+Time: 0.30 s
+
+[2025-04-16 21:24:15] pagerank.py
+Maximum: 46.02 MB
+Time: 0.30 s
+
+[2025-04-16 21:24:16] pagerank.py
+Maximum: 46.62 MB
+Time: 0.30 s
+
