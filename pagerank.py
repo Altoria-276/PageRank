@@ -1,6 +1,5 @@
 import numpy as np
 import scipy.sparse as sp
-import time
 
 
 def load_graph(filename):
@@ -29,7 +28,7 @@ def pagerank_advanced(adj, alpha=0.85, beta=0.0, tol=1e-6, max_iter=1000000):
     r = np.ones(n) / n
     teleport = np.ones(n) / n  # 可替换为其他个性化向量
 
-    for i in range(max_iter):
+    for _ in range(max_iter):
         dead_end_mass = np.sum(r[dangling]) / n
         r_new = alpha * (M @ r + dead_end_mass) + beta * r + (1 - alpha - beta) * teleport
 
@@ -49,7 +48,6 @@ def save_topk(ranks, topk=100, filename="Res.txt"):
 
 
 def main():
-    start = time.time()
     adj = load_graph("Data.txt")
     ranks = pagerank_advanced(adj, alpha=0.85, beta=0.05, tol=1e-6)
     save_topk(ranks)

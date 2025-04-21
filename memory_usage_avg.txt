@@ -1,5 +1,0 @@
-file: .\main.py avg maximum mem: 4.12 MB
-file: .\main.py avg maximum mem: 4.11 MB
-file: .\pagerank.py avg maximum mem: 4.11 MB
-file: .\main.cpp avg maximum mem: 4.11 MB
-file: .\main.py avg maximum mem: 4.11 MB
