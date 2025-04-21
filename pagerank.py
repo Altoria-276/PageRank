@@ -1,8 +1,9 @@
+import argparse
 import numpy as np
 import scipy.sparse as sp
 
 
-def load_graph(filename):
+def load_graph(filename) -> sp.csc_array:
     rows, cols = [], []
     with open(filename, "r") as f:
         for line in f:
@@ -15,7 +16,7 @@ def load_graph(filename):
     return adj
 
 
-def pagerank_advanced(adj, alpha=0.85, beta=0.0, tol=1e-6, max_iter=1000000):
+def pagerank_advanced(adj: sp.csc_array, alpha=0.85, beta=0.0, tol=1e-6, max_iter=1000):
     n = adj.shape[0]
     out_degree = np.array(adj.sum(axis=0)).flatten()
     dangling = out_degree == 0
@@ -48,9 +49,18 @@ def save_topk(ranks, topk=100, filename="Res.txt"):
 
 
 def main():
-    adj = load_graph("Data.txt")
-    ranks = pagerank_advanced(adj, alpha=0.85, beta=0.05, tol=1e-6)
-    save_topk(ranks)
+    parser = argparse.ArgumentParser(description="Advanced PageRank algorithm implementation")
+    parser.add_argument("--input", default="Data.txt", help="Input file path")
+    parser.add_argument("--output", default="Res.txt", help="Output file path")
+    parser.add_argument("--alpha", type=float, default=0.85, help="Damping factor")
+    parser.add_argument("--beta", type=float, default=0.05, help="Current rank retention ratio")
+    parser.add_argument("--tol", type=float, default=1e-6, help="Convergence threshold")
+    parser.add_argument("--max_iter", type=int, default=1000, help="Maximum iterations")
+    args = parser.parse_args()
+
+    adj = load_graph(args.input)
+    ranks = pagerank_advanced(adj, alpha=args.alpha, beta=args.beta, tol=args.tol, max_iter=args.max_iter)
+    save_topk(ranks, filename=args.output)
 
 
 if __name__ == "__main__":

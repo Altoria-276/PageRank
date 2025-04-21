@@ -82,7 +82,8 @@ def main():
         sys.exit(1)
 
     compiler = os.environ.get("CXX", "g++")
-    compile_flags = os.environ.get("CXXFLAGS", "-fopenmp -mavx2")
+    # compile_flags = os.environ.get("CXXFLAGS", "-fopenmp -mavx2")
+    compile_flags = os.environ.get("CXXFLAGS", "-fopenmp -mavx2 -static")
 
     executable = compile_cpp(cpp_file, compiler=compiler, compile_flags=compile_flags)
 
