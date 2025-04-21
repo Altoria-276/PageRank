@@ -1,8 +1,10 @@
+#include <algorithm>
 #include <cmath>
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
+
 using namespace std;
 
 // SparseMatrix class using CSR format
@@ -111,12 +113,6 @@ int main() {
     infile.close();
     int N = maxNode + 1;
 
-    // Old dense 2D matrix version (commented out)
-    // vector<vector<double>> denseMat(N, vector<double>(N, 0.0));
-    // for (auto &e : edges) {
-    //     denseMat[e.first][e.second] = 1.0;
-    // }
-
     // Build sparse matrix
     SparseMatrix mat(N, N);
     for (auto &e : edges) mat.addEntry(e.first, e.second);
@@ -125,19 +121,36 @@ int main() {
     // PageRank parameters
     double damping = 0.85;
     double eps = 1e-6;
-    int maxIter = 100;
+    int maxIter = 1000000;
 
     // Compute PageRank
     vector<double> pr = pagerank(mat, damping, eps, maxIter);
 
-    // Write results to Res.txt
+    // Pair ranks with node indices
+    vector<pair<double, int>> pr_with_idx;
+    pr_with_idx.reserve(N);
+    for (int i = 0; i < N; ++i) {
+        pr_with_idx.emplace_back(pr[i], i);
+    }
+    // Sort descending by PageRank value
+    sort(pr_with_idx.begin(), pr_with_idx.end(),
+         [](const pair<double, int> &a, const pair<double, int> &b) {
+             return a.first > b.first;
+         });
+
+    // Write top 100 results to Res.txt
     ofstream outfile("Res.txt");
     if (!outfile) {
         cerr << "Failed to open file Res.txt" << endl;
         return 1;
     }
-    outfile << "Node\tPageRank" << endl;
-    for (int i = 0; i < N; ++i) outfile << i << "\t" << pr[i] << endl;
+
+    int topK = min(100, N);
+    for (int i = 0; i < topK; ++i) {
+        int node = pr_with_idx[i].second;
+        double score = pr_with_idx[i].first;
+        outfile << node << " " << score << endl;
+    }
     outfile.close();
 
     return 0;

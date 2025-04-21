@@ -27,7 +27,7 @@ def monitor_memory(script_path, *args):
 
                 print(f"\r memory used:{memory_used:.2f} MB, Maximum: {max_memory:.2f} MB", end="")
 
-                time.sleep(0.1)
+                # time.sleep(0.1)
             except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
                 break
     except KeyboardInterrupt:

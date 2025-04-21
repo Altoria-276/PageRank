@@ -1,10 +1,5 @@
-file: pagerank.py avg maximum mem: 47.67 MB
-file: pagerank_deepseek.py avg maximum mem: 53.36 MB
-file: pagerank.py avg maximum mem: 44.36 MB
-file: .\pagerank.py avg maximum mem: 3.81 MB
-file: .\pagerank.py avg maximum mem: 3.81 MB
-file: .\pagerank_deepseek.py avg maximum mem: 3.81 MB
-file: .\pagerankbase.py avg maximum mem: 3.81 MB
-file: pagerank.py avg maximum mem: 3.82 MB
-file: pagerank.py avg maximum mem: 3.81 MB
-file: pagerank.py avg maximum mem: 3.82 MB
+file: .\main.py avg maximum mem: 4.12 MB
+file: .\main.py avg maximum mem: 4.11 MB
+file: .\pagerank.py avg maximum mem: 4.11 MB
+file: .\main.cpp avg maximum mem: 4.11 MB
+file: .\main.py avg maximum mem: 4.11 MB
