@@ -31,16 +31,20 @@ def pagerank_advanced(adj: sp.csc_array, alpha=0.85, beta=0.0, tol=1e-6, max_ite
 ```
 
 M 为转移矩阵，迭代方程为
+
 $$
 r_{new}=\alpha\cdot(M\times r+D)+\beta\cdot r+(1-\alpha-\beta)\cdot T
 $$
+
 其中 D 矩阵用于解决 Dead Ends 问题，即 Dead Ends 结点随机跳转至任意结点。
 
 T 矩阵用于解决 Spider Traps 问题，用于一定概率的全局随机跳转避免蜘蛛陷阱。
 
 ### 内存优化
 
-数据矩阵通过 CSC 存储，使用 scipy.sparse.csc_array
+PageRank 的链接矩阵通常是高度稀疏的（每个网页的出入链数远小于总网页数），稀疏仅存储非零元素，可以大幅降低内存占用。
+
+本实验选择 CSC 稀疏矩阵存储，使用 scipy.sparse.csc_array。相对于 COO & CSR，CSC 格式可直接遍历每列的非零元素，快速计算列的归一化权重（如出链数的倒数）。
 
 ### 结果分析
 
@@ -58,4 +62,3 @@ T 矩阵用于解决 Spider Traps 问题，用于一定概率的全局随机跳�
 7541 0.000178745
 3699 0.000178184
 ```
-
