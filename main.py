@@ -164,8 +164,8 @@ def main():
     parser.add_argument("--input", default="Data.txt", help="Input file path")
     parser.add_argument("--output", default="Res.txt", help="Output file path")
     parser.add_argument("--tol", type=float, default=1e-6, help="Convergence threshold")
-    parser.add_argument("--use_spider_check", type=bool, default=True, help="Use spider check")
-    parser.add_argument("--use_block", type=bool, default=False, help="Use block matrix")
+    parser.add_argument("--use_spider_check", type=int, default=0, help="Use spider check")
+    parser.add_argument("--use_block", type=int, default=0, help="Use block matrix")
     args = parser.parse_args()
 
     global TOL
@@ -185,11 +185,13 @@ def main():
         threshold = max(1000, int(n * 0.05))
         # 自动选择是否启用蜘蛛陷阱处理
         # use_spider_trap = spider_count > threshold
-        use_spider_trap = False
+        use_spider_trap = args.use_spider_check
         # 是否启用Block Matrix（可根据需要添加自动逻辑）
         use_block = args.use_block
 
-        print(f"Total nodes: {n}, Threshold: {threshold}, Use Spider Trap Handling: {use_spider_trap}")
+        print(
+            f"Total nodes: {n}, Threshold: {threshold}, Use Spider Trap Handling: {use_spider_trap == 1}, Use Block Matrix: {use_block == 1}"
+        )
 
         # 选择算法
         t_calc = time.time()
@@ -201,7 +203,7 @@ def main():
             pr = pagerank(adj, dead_mask)
 
         print(f"PageRank computed in {time.time()-t_calc:.2f}s")
-        save_topk(pr)
+        save_topk(pr, filename=args.output)
     finally:
         monitor.stop()
         monitor.join()
