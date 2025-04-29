@@ -4,3 +4,7 @@ __pycache__/
 
 memory_usage_*.txt
 *.exe
+
+build/
+dist/
+reports/
