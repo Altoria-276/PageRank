@@ -4,15 +4,29 @@ import scipy.sparse as sp
 import time
 import psutil
 import os
-from scipy.sparse import csc_matrix
+from scipy.sparse import csr_matrix  # 改为CSR格式
 from scipy.sparse.csgraph import connected_components
 import threading
 
 TOL = 1e-6
+DATA_FILE = "Data.txt"
+
+
+def load_text_chunked():
+    chunks = []
+    chunk_size = 10000
+    with open(DATA_FILE, "r", encoding="utf-8") as f:
+        while True:
+            chunk = np.loadtxt(f, dtype=np.uint32, max_rows=chunk_size)
+            if chunk.size == 0:
+                break
+            chunks.append(chunk)
+    return np.concatenate(chunks) if chunks else np.empty((0, 2), dtype=np.uint32)
 
 
 def load_graph(filename, use_spider_check=False, spider_threshold=1):
     """单次IO优化加载图并可选检测蜘蛛节点"""
+    # data = load_text_chunked()
     data = np.loadtxt(filename, dtype=np.int32)
     src = data[:, 0]
     dst = data[:, 1]
@@ -23,12 +37,12 @@ def load_graph(filename, use_spider_check=False, spider_threshold=1):
     np.maximum(out_degree, 1.0, out=out_degree)  # 避免除零
 
     inv_degree = 1.0 / out_degree[src]
-    adj = csc_matrix((inv_degree, (dst, src)), shape=(n, n), dtype=np.float32)
+    # 使用CSR格式替代CSC格式
+    adj = csr_matrix((inv_degree, (dst, src)), shape=(n, n), dtype=np.float32)
     adj.sum_duplicates()
 
     spider_nodes = None
     if use_spider_check:
-        # 出度小于等于阈值视为蜘蛛节点
         spider_nodes = np.where(out_degree <= spider_threshold)[0]
         print(f"Found {len(spider_nodes)} potential spider nodes (out_degree <= {spider_threshold})")
 
@@ -36,43 +50,33 @@ def load_graph(filename, use_spider_check=False, spider_threshold=1):
 
 
 def pagerank_spider_trap(adj, alpha=0.85, tol=TOL, max_iter=50000):
-    """带蜘蛛陷阱检测和处理的PageRank"""
+    """带蜘蛛陷阱检测和处理的PageRank（CSR版）"""
     n = adj.shape[0]
     pr = np.full(n, 1.0 / n, dtype=np.float32)
     teleport = (1 - alpha) / n
 
-    # 计算出度及死节点
     out_degree = adj.sum(axis=0).A1.astype(np.float32)
     dangling = out_degree == 0
 
-    # 强连通分量检测蜘蛛陷阱
     n_comp, labels = connected_components(adj, directed=True, connection="strong")
     trap_mask = np.zeros(n, dtype=bool)
     for comp in range(n_comp):
         nodes = np.where(labels == comp)[0]
         sub = adj[nodes, :][:, nodes]
-        # 如果子图没有出边，则整个连通分量是陷阱
         if sub.sum() == adj[nodes, :].sum():
             trap_mask[nodes] = True
     print(f"Detected {trap_mask.sum()} spider-trap nodes via strong components")
 
     for i in range(max_iter):
         old = pr.copy()
-        # 处理死节点与陷阱节点
         dangling_sum = alpha * old[dangling].sum()
         trap_sum = alpha * old[trap_mask].sum()
 
-        # 基本迭代
         pr = alpha * adj.dot(old)
-        # 添加 teleport
         pr += teleport
-        # 添加额外处理：死节点及蜘蛛陷阱贡献各自均匀分布
         pr += dangling_sum / n + trap_sum / n
-
-        # 归一化
         pr /= pr.sum()
 
-        # 收敛检测
         if np.linalg.norm(pr - old, 1) < tol:
             print(f"[SpiderTrap] Converged at {i+1} iterations, delta={np.linalg.norm(pr-old,1):.2e}")
             break
@@ -80,7 +84,7 @@ def pagerank_spider_trap(adj, alpha=0.85, tol=TOL, max_iter=50000):
 
 
 def pagerank(adj, dead_mask, alpha=0.85, tol=TOL, max_iter=50000):
-    """标准Pagerank，稀疏矩阵直接乘"""
+    """标准Pagerank，稀疏矩阵（CSR）直接乘"""
     n = adj.shape[0]
     pr = np.full(n, 1.0 / n, dtype=np.float32)
     pr_next = np.zeros_like(pr)
@@ -102,7 +106,7 @@ def pagerank(adj, dead_mask, alpha=0.85, tol=TOL, max_iter=50000):
 
 
 def block_pagerank(adj, dead_mask, alpha=0.85, tol=TOL, max_iter=50000, block_size=None):
-    """Block Matrix版PageRank（分块大小就是数据集大小）"""
+    """Block Matrix版PageRank（分块大小就是数据集大小，CSR版）"""
     n = adj.shape[0]
     if block_size is None or block_size >= n:
         block_size = n
@@ -160,38 +164,32 @@ class MemoryMonitor(threading.Thread):
 
 
 def main():
+
     parser = argparse.ArgumentParser(description="PageRank Algorithm")
     parser.add_argument("--input", default="Data.txt", help="Input file path")
     parser.add_argument("--output", default="Res.txt", help="Output file path")
     parser.add_argument("--tol", type=float, default=1e-6, help="Convergence threshold")
-    parser.add_argument("--use_spider_check", type=bool, default=True, help="Use spider check")
-    parser.add_argument("--use_block", type=bool, default=False, help="Use block matrix")
+    parser.add_argument("--use_spider_check", default=1, help="Use spider check 0/1")
+    parser.add_argument("--use_spider_trap", default=0, help="Use spider trap 0/1")
+    parser.add_argument("--use_block", default=0, help="Use block matrix 0/1")
     args = parser.parse_args()
 
-    global TOL
+    global TOL, DATA_FILE
     TOL = args.tol
+    DATA_FILE = args.input
 
     monitor = MemoryMonitor()
     monitor.start()
     try:
         t_start = time.time()
-        # 加载图并检测蜘蛛节点
-        adj, dead_mask, spider_nodes = load_graph(args.input, use_spider_check=args.use_spider_check)
+        adj, dead_mask, spider_nodes = load_graph(args.input, use_spider_check=args.use_spider_check == 1)
         n = adj.shape[0]
         spider_count = len(spider_nodes) if spider_nodes is not None else 0
         print(f"Detected {spider_count} spider nodes.")
-
-        # 动态计算阈值：取总节点数的5%和1000中的较大者
         threshold = max(1000, int(n * 0.05))
-        # 自动选择是否启用蜘蛛陷阱处理
-        # use_spider_trap = spider_count > threshold
-        use_spider_trap = False
-        # 是否启用Block Matrix（可根据需要添加自动逻辑）
-        use_block = args.use_block
-
+        use_spider_trap = args.use_spider_trap == 1
+        use_block = args.use_block == 1
         print(f"Total nodes: {n}, Threshold: {threshold}, Use Spider Trap Handling: {use_spider_trap}")
-
-        # 选择算法
         t_calc = time.time()
         if use_spider_trap:
             pr = pagerank_spider_trap(adj)
@@ -199,9 +197,8 @@ def main():
             pr = block_pagerank(adj, dead_mask)
         else:
             pr = pagerank(adj, dead_mask)
-
         print(f"PageRank computed in {time.time()-t_calc:.2f}s")
-        save_topk(pr)
+        save_topk(pr=pr, filename=args.output)
     finally:
         monitor.stop()
         monitor.join()
