@@ -3,14 +3,16 @@ import time
 import psutil
 import os
 import threading
+from scipy.sparse import csc_matrix
 
 TOL = 1e-6
 DATA_FILE = "Data.txt"
 
+
 def load_graph(filename, use_spider_check=False, spider_threshold=1):
     """基础IO加载图，不使用CSR或快速读取"""
     edges = []
-    with open(filename, 'r') as f:
+    with open(filename, "r") as f:
         for line in f:
             parts = line.strip().split()
             if len(parts) >= 2:
@@ -38,7 +40,7 @@ def load_graph(filename, use_spider_check=False, spider_threshold=1):
         adj[v, u] += 1.0 / out_degree[u]
 
     # 死节点掩码
-    dead_mask = (out_degree == 1.0)
+    dead_mask = out_degree == 1.0
 
     spider_nodes = None
     if use_spider_check:
@@ -46,6 +48,7 @@ def load_graph(filename, use_spider_check=False, spider_threshold=1):
         print(f"Found {len(spider_nodes)} potential spider nodes (out_degree <= {spider_threshold})")
 
     return adj, dead_mask, spider_nodes
+
 
 def pagerank(adj, dead_mask, alpha=0.85, tol=TOL, max_iter=50000):
     """标准PageRank，使用密集矩阵乘法"""
@@ -65,15 +68,18 @@ def pagerank(adj, dead_mask, alpha=0.85, tol=TOL, max_iter=50000):
             break
     return pr
 
-def save_topk(pr, topk=100, filename='Res.txt'):
+
+def save_topk(pr, topk=100, filename="Res.txt"):
     """简单Top-K输出，无缓冲优化"""
     top_indices = np.argsort(-pr)[:topk]
-    with open(filename, 'w') as f:
+    with open(filename, "w") as f:
         for idx in top_indices:
             f.write(f"{idx} {pr[idx]:.10f}\n")
 
+
 class MemoryMonitor(threading.Thread):
     """内存监控线程"""
+
     def __init__(self):
         super().__init__(daemon=True)
         self.peak = 0
@@ -112,5 +118,5 @@ def main():
     print(f"Total elapsed time: {time.time() - t_start:.2f}s")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
